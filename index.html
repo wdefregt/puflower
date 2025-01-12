@@ -3,158 +3,142 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>密码保护页面 - 文件管理</title>
+  <title>网盘管理系统</title>
   <style>
-    /* 样式 */
     body {
       font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
       margin: 0;
       padding: 0;
-      background-color: #f4f4f9;
     }
     .container {
       width: 80%;
       margin: 20px auto;
     }
-    .folder {
-      background-color: #8bc34a;
-      padding: 20px;
-      margin: 10px;
-      cursor: pointer;
-      display: inline-block;
-      color: white;
-      border-radius: 5px;
-      text-align: center;
-      width: 120px;
-    }
-    .file {
-      background-color: #3f51b5;
+    .folder, .file {
+      border: 1px solid #ccc;
       padding: 10px;
       margin: 5px;
-      cursor: pointer;
       display: inline-block;
-      color: white;
+      width: 120px;
+      text-align: center;
       border-radius: 5px;
+      cursor: pointer;
+      background-color: #e8f5e9;
+      color: #2e7d32;
     }
-    #fileUpload {
-      display: none;
+    .file {
+      background-color: #e3f2fd;
+      color: #1565c0;
     }
-    .error {
-      color: red;
+    .folder:hover, .file:hover {
+      background-color: #dcedc8;
+    }
+    button {
+      margin: 5px 0;
+    }
+    .actions {
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <script type="text/javascript">
-    var password = "abc.americ.us.kg";  // 设置密码
-    var isAuthenticated = false;
-
-    // 密码验证
-    function passwordCheck() {
-      var userpassword = prompt("请输入密码:");
-      if (userpassword === password) {
-        isAuthenticated = true;
-        document.getElementById('content').style.display = 'block';
-        document.getElementById('login').style.display = 'none';
-      } else {
-        alert("密码错误!");
-        window.location = 'about:blank'; // 密码错误后清空页面
-      }
-    }
-
-    window.onload = passwordCheck;
-  </script>
-
-  <!-- 登录区域 -->
-  <div id="login" style="text-align:center; padding-top:50px;">
-    <h2>请输入密码才能访问此页面</h2>
-  </div>
-
-  <!-- 受密码保护的内容 -->
-  <div id="content" style="display:none;">
-    <div class="container">
-      <h1>文件管理</h1>
-      <div id="folders"></div>
+  <div class="container">
+    <h1>网盘管理系统</h1>
+    <div class="actions">
       <button onclick="createFolder()">创建文件夹</button>
-      <hr>
-      <input type="file" id="fileUpload" onchange="handleFileUpload(event)">
+      <input type="file" id="fileUpload" style="display: none;" onchange="uploadFile(event)">
       <button onclick="document.getElementById('fileUpload').click()">上传文件</button>
-      <div id="files"></div>
+    </div>
+    <div id="fileManager">
+      <!-- 文件夹和文件显示区域 -->
     </div>
   </div>
 
-  <script type="text/javascript">
-    var files = []; // 模拟的文件列表
-    var folders = []; // 模拟的文件夹列表
+  <script>
+    let files = []; // 文件列表
+    let folders = []; // 文件夹列表
+
+    // 渲染文件和文件夹
+    function render() {
+      const fileManager = document.getElementById('fileManager');
+      fileManager.innerHTML = '';
+
+      // 渲染文件夹
+      folders.forEach((folder, index) => {
+        const folderElement = document.createElement('div');
+        folderElement.className = 'folder';
+        folderElement.innerHTML = `
+          📁 ${folder.name} 
+          <br><button onclick="openFolder(${index})">打开</button>
+          <button onclick="deleteFolder(${index})">删除</button>
+        `;
+        fileManager.appendChild(folderElement);
+      });
+
+      // 渲染文件
+      files.forEach((file, index) => {
+        const fileElement = document.createElement('div');
+        fileElement.className = 'file';
+        fileElement.innerHTML = `
+          📄 ${file.name}
+          <br><button onclick="downloadFile(${index})">下载</button>
+          <button onclick="deleteFile(${index})">删除</button>
+        `;
+        fileManager.appendChild(fileElement);
+      });
+    }
 
     // 创建文件夹
     function createFolder() {
-      var folderName = prompt("请输入文件夹名称:");
+      const folderName = prompt('请输入文件夹名称:');
       if (folderName) {
-        folders.push(folderName);
-        renderFolders();
+        folders.push({ name: folderName });
+        render();
       }
     }
 
-    // 渲染文件夹
-    function renderFolders() {
-      var folderContainer = document.getElementById('folders');
-      folderContainer.innerHTML = "";
-      folders.forEach(function(folder, index) {
-        var folderElement = document.createElement('div');
-        folderElement.className = "folder";
-        folderElement.textContent = folder;
-        folderElement.onclick = function() {
-          alert("进入文件夹：" + folder);
-        };
-        folderContainer.appendChild(folderElement);
-      });
+    // 删除文件夹
+    function deleteFolder(index) {
+      if (confirm(`确定删除文件夹 ${folders[index].name} 吗？`)) {
+        folders.splice(index, 1);
+        render();
+      }
     }
 
-    // 上传文件并显示
-    function handleFileUpload(event) {
-      var file = event.target.files[0];
+    // 打开文件夹（模拟，实际应请求后端数据）
+    function openFolder(index) {
+      alert(`打开文件夹: ${folders[index].name}`);
+    }
+
+    // 上传文件
+    function uploadFile(event) {
+      const file = event.target.files[0];
       if (file) {
         files.push(file);
-        renderFiles();
+        render();
       }
     }
 
-    // 渲染文件
-    function renderFiles() {
-      var fileContainer = document.getElementById('files');
-      fileContainer.innerHTML = "";
-      files.forEach(function(file, index) {
-        var fileElement = document.createElement('div');
-        fileElement.className = "file";
-        fileElement.textContent = file.name;
-        fileElement.setAttribute('draggable', true);
-        fileElement.ondragstart = function(event) {
-          event.dataTransfer.setData("fileIndex", index);
-        };
-        fileElement.ondragover = function(event) {
-          event.preventDefault();
-        };
-        fileElement.ondrop = function(event) {
-          event.preventDefault();
-          var draggedIndex = event.dataTransfer.getData("fileIndex");
-          if (draggedIndex != index) {
-            var draggedFile = files[draggedIndex];
-            files[draggedIndex] = files[index];
-            files[index] = draggedFile;
-            renderFiles();
-          }
-        };
-        var deleteBtn = document.createElement('button');
-        deleteBtn.textContent = "删除";
-        deleteBtn.onclick = function() {
-          files.splice(index, 1);
-          renderFiles();
-        };
-        fileElement.appendChild(deleteBtn);
-        fileContainer.appendChild(fileElement);
-      });
+    // 下载文件
+    function downloadFile(index) {
+      const file = files[index];
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(file);
+      link.download = file.name;
+      link.click();
     }
+
+    // 删除文件
+    function deleteFile(index) {
+      if (confirm(`确定删除文件 ${files[index].name} 吗？`)) {
+        files.splice(index, 1);
+        render();
+      }
+    }
+
+    // 初始化
+    render();
   </script>
 </body>
 </html>
