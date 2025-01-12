@@ -1,1 +1,27 @@
-hello boy and girl
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Password Protected Page</title>
+  <script type="text/javascript">
+    var password = "abc.americ.us.kg";  // 设定你的密码
+    var passcheck = function() {
+      var userpassword = prompt("请输入密码:");
+      if (userpassword === password) {
+        document.getElementById('content').style.display = 'block';
+      } else {
+        alert("密码错误!");
+        window.location = 'about:blank';  // 密码错误后关闭页面
+      }
+    };
+    window.onload = passcheck;
+  </script>
+</head>
+<body style="display:none;">
+  <div id="content" style="display:none;">
+    <h1>欢迎来到我的GitHub页面</h1>
+    <p>这是需要密码保护的页面内容。</p>
+  </div>
+</body>
+</html>
